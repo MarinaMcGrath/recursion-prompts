@@ -24,6 +24,12 @@ var sum = function(array) {
 // 3. Sum all numbers in an array containing nested arrays.
 // Example: arraySum([1,[2,3],[[4]],5]); // 15
 var arraySum = function(array) {
+    var flat = flatten(array);
+    if(flat.length === 0) return 0;
+    if(flat.length === 1) return flat[0];
+    flat[0] += flat[flat.length - 1];
+    flat.pop();
+    return arraySum(flat);  
 };
 
 // 4. Check if a number is even.
@@ -96,8 +102,8 @@ var reverse = function(string) {
 
 // 10. Write a function that determines if a string is a palindrome.
 var palindrome = function(string) {
-    var cleanStr = string.toLowerCase();
-    var cleanReverse = reverse(string).toLowerCase();
+    var cleanStr = string.toLowerCase().replace(" ", "");
+    var cleanReverse = reverse(string).toLowerCase().replace(" ", "");
     return cleanStr === cleanReverse;
 };
 
@@ -107,6 +113,7 @@ var palindrome = function(string) {
 // modulo(17,5) // 2
 // modulo(22,6) // 4
 var modulo = function(x, y) {
+
 };
 
 // 12. Write a function that multiplies two numbers without using the * operator  or
@@ -121,6 +128,15 @@ var multiply = function(x, y) {
 // 13. Write a function that divides two numbers without using the / operator  or
 // JavaScript's Math object.
 var divide = function(x, y) {
+    // var counter = Array.from(arguments)[2] || 0;
+    // if(x < 0 && y < 0) {
+    //     return divide(-x, -y);
+    // }
+    // if(x < y) return counter;
+    // else if(x >= y){
+    //     counter++;
+    //     return divide(x -=y , y, counter);
+    // }
 };
 
 // 14. Find the greatest common divisor (gcd) of two positive numbers.  The GCD of two
@@ -129,6 +145,7 @@ var divide = function(x, y) {
 // http://www.cse.wustl.edu/~kjg/cse131/Notes/Recursion/recursion.html
 // https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/the-euclidean-algorithm
 var gcd = function(x, y) {
+
 };
 
 // 15. Write a function that compares each character of two strings and returns true if
@@ -136,18 +153,13 @@ var gcd = function(x, y) {
 // compareStr('house', 'houses') // false
 // compareStr('', '') // true
 // compareStr('tomato', 'tomato') // true
-var compareStr = function(str1, str2) {    
-    var result = true;
+var compareStr = function(str1, str2) { 
     var counter = Array.from(arguments)[2] || 0;
+    if(str1.length !== str2.length) return false;
+    else if(str1[counter] !== str2[counter]) return false;
+    if(counter === str1.length) return str1[counter] === str2[counter];
+    else if(str1[counter] === str2[counter]) return compareStr(str1, str2, ++counter);
     
-    if(counter === str1.length || counter === str2.length) return result;
-    if(str1[counter] !== str2[counter]) {
-        result = false;
-        return result;
-        
-    } else if(str1[counter] === str2[counter]){
-        return compareStr(str1, str2, ++counter);
-    }
 };
 
 // 16. Write a function that accepts a string and creates an array where each letter
@@ -164,7 +176,7 @@ var createArray = function(str){
 // 17. Reverse the order of an array
 var reverseArr = function (array) {    
     if (array.length === 0) return array;
-    else return reverse(array.slice(1)) + array.charAt(0);  
+    else return reverseArr(array.slice(1)) + array[0];  
 };
 
 // 18. Create a new array with a given value and length.
@@ -206,6 +218,11 @@ var rMap = function(array, callback) {
 // countKeysInObj(testobj, 'r') // 1
 // countKeysInObj(testobj, 'e') // 2
 var countKeysInObj = function(obj, key) {
+    var count = Array.from(arguments)[2] || 0;
+    if((key in obj)){
+        count++;
+
+    }
 };
 
 // 22. Write a function that counts the number of times a value occurs in an object.
@@ -226,6 +243,14 @@ var replaceKeysInObj = function(obj, key, newKey) {
 // fibonacci(5);  // [0, 1, 1, 2, 3, 5]
 // Note:  The 0 is not counted.
 var fibonacci = function(n) {
+    var fib = Array.from(arguments)[1] || [0, 1];
+    if(n <= 0) return null;
+    if(fib.length === n + 1) return fib;
+    var val1 = fib[fib.length - 2];
+    var val2 = fib[fib.length - 1];
+    var sum = val1 + val2;
+    fib.push(sum);
+    return fibonacci(n, fib);
 };
 
 // 25. Return the Fibonacci number located at index n of the Fibonacci sequence.
@@ -234,6 +259,11 @@ var fibonacci = function(n) {
 // nthFibo(7); // 13
 // nthFibo(3); // 2
 var nthFibo = function(n) {
+    var fibSeq = fibonacci(n);
+    if(n < 0) return null;
+    if(n === 0) return n;
+    var spot = fibSeq[n];
+    return spot;
 };
 
 // 26. Given an array of words, return a new array containing each word capitalized.
@@ -277,14 +307,31 @@ var nestedEvenSum = function(obj) {
 
 // 29. Flatten an array containing nested arrays.
 // Example: flatten([1,[2],[3,[[4]]],5]); // [1,2,3,4,5]
-var flatten = function(arrays) {
+var flatten = function(nestedArray, result) {
+    return nestedArray.reduce((flat, cur)=>{
+      if(!Array.isArray(cur)){
+        flat.push(cur);
+        return flat;
+      }
+      return flatten(cur, flat);
+    }, result || []);
+    
 };
+
 
 // 30. Given a string, return an object containing tallies of each letter.
 // letterTally('potato'); // {'p':1, 'o':2, 't':2, 'a':1}
 var letterTally = function(str, obj) {    
     var obj = Array.from(arguments)[1] || {};
     var arr = str.split("");
+    var i = Array.from(arguments)[2] || 0;
+    if(i === arr.length) return obj;
+    if((arr[i] in obj)){
+        obj[arr[i]] += 1;
+        return letterTally(str, obj, ++i);
+    } 
+    obj[arr[i]] = 1;
+    return letterTally(str, obj, ++i);
 };
 
 // 31. Eliminate consecutive duplicates in a list.  If the list contains repeated
@@ -309,26 +356,69 @@ var compress = function(list) {
 // itself.
 // Example: augmentElements([[],[3],[7]], 5); // [[5],[3,5],[7,5]]
 var augmentElements = function(array, aug) {
+    var i = Array.from(arguments)[2] || 0;
+    if(i === array.length) return array;
+    array[i].push(aug);
+    return augmentElements(array, aug, ++i);
 };
 
 // 33. Reduce a series of zeroes to a single 0.
 // minimizeZeroes([2,0,0,0,1,4]) // [2,0,1,4]
 // minimizeZeroes([2,0,0,0,1,0,0,4]) // [2,0,1,0,4]
-var minimizeZeroes = function(array) {
+var minimizeZeroes = function(array, i = 0) {
+    if(i === array.length) return array;
+    if(array[i] === 0 && array[i + 1] === 0){
+        array.splice(i, 1);
+        return minimizeZeroes(array, ++i)
+    }
+    return minimizeZeroes(array, ++i);
 };
 
 // 34. Alternate the numbers in an array between positive and negative regardless of
 // their original sign.  The first number in the index always needs to be positive.
 // alternateSign([2,7,8,3,1,4]) // [2,-7,8,-3,1,-4]
 // alternateSign([-2,-7,8,3,-1,4]) // [2,-7,8,-3,1,-4]
-var alternateSign = function(array) {
+var alternateSign = function(array, i = 0) {
+    if(i === array.length) return array;
+    if(isEven(i)){
+        if(array[i] < 0){
+            array[i] = -array[i];
+        }
+        return alternateSign(array, ++i);
+    }
+    if(array[i] > 0){
+        array[i] = -array[i];
+    }
+    return alternateSign(array, ++i);
+
 };
 
 // 35. Given a string, return a string with digits converted to their word equivalent.
 // Assume all numbers are single digits (less than 10).
 // numToText("I have 5 dogs and 6 ponies"); // "I have five dogs and six ponies"
-var numToText = function(str) {
+var numToText = function(str, i = 0) {
+    var words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+    var arr = Array.from(arguments)[2] || str.split(' ');
+    if(i === arr.length) return arr.join(' ');
+    if(arr[i] - 0 >= 0){
+        arr[i] = words[arr[i] - 0];
+        return numToText(str, ++i, arr);
+    }    
+    return numToText(str, ++i, arr);
+
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 // *** EXTRA CREDIT ***
 
