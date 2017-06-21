@@ -114,6 +114,7 @@ var palindrome = function(string) {
 // modulo(22,6) // 4
 var modulo = function(x, y) {
 
+
 };
 
 // 12. Write a function that multiplies two numbers without using the * operator  or
@@ -218,11 +219,14 @@ var rMap = function(array, callback) {
 // countKeysInObj(testobj, 'r') // 1
 // countKeysInObj(testobj, 'e') // 2
 var countKeysInObj = function(obj, key) {
-    var count = Array.from(arguments)[2] || 0;
-    if((key in obj)){
-        count++;
-
+    var total = Array.from(arguments)[2] || 0;
+    for(var k in obj){
+        if(k === key) total += 1;
+        if(typeof obj[k] === 'object') {
+            return countKeysInObj(obj[k], key, total);
+        }    
     }
+    return total;
 };
 
 // 22. Write a function that counts the number of times a value occurs in an object.
@@ -230,11 +234,29 @@ var countKeysInObj = function(obj, key) {
 // countValuesInObj(testobj, 'r') // 2
 // countValuesInObj(testobj, 'e') // 1
 var countValuesInObj = function(obj, value) {
+    var total = Array.from(arguments)[2] || 0;
+    for(var k in obj){
+        if(obj[k] === value) total += 1;
+        if(typeof obj[k] === 'object') {
+            return countValuesInObj(obj[k], value, total);
+        }    
+    }
+    return total;
 };
 
 // 23. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, key, newKey) {
+    for(var k in obj){
+        if(k === key) {
+            obj[newKey] = obj[k];
+            delete obj[k];
+        }
+        if(typeof obj[k] === 'object') {
+            return countKeysInObj(obj[k], key);
+        }    
+    }
+    return obj;
 };
 
 // 24. Get the first n Fibonacci numbers.  In the Fibonacci Sequence, each subsequent
@@ -303,6 +325,16 @@ var capitalizeFirst = function(array) {
 // };
 // nestedEvenSum(obj1); // 10
 var nestedEvenSum = function(obj) {
+    var total = Array.from(arguments)[1] || 0;
+    for(var key in obj){
+        if(typeof obj[key] === 'object'){
+            return nestedEvenSum(obj[key], total);
+        }
+        if(typeof obj[key] === 'number'){
+            if(isEven(obj[key])) total += obj[key];
+        }    
+    }
+    return total;
 };
 
 // 29. Flatten an array containing nested arrays.
