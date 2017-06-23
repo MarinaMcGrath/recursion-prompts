@@ -118,11 +118,10 @@ var palindrome = function(string) {
 // modulo(17,5) // 2
 // modulo(22,6) // 4
 var modulo = function(x, y) {
-    if(x === 0 || x < y) return 0;
-    if(y === 0) return NaN;
-    if(y === 1) return x;
-
-
+var q = divide(x, y);
+var p = multiply(q, y);
+var m = x - p;
+return m;
 
 };
 
@@ -267,11 +266,12 @@ var countValuesInObj = function(obj, value) {
 var replaceKeysInObj = function(obj, key, newKey) {
     for(var k in obj){
         if(k === key) {
-            obj[newKey] = obj[k];
-            delete obj[k];
+            Object.defineProperty(obj, newKey,
+                Object.getOwnPropertyDescriptor(obj, k));
+            delete obj[k];    
         }
         if(typeof obj[k] === 'object') {
-            return countKeysInObj(obj[k], key);
+            return replaceKeysInObj(obj[k], key, newKey);
         }    
     }
     return obj;
