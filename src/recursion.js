@@ -103,9 +103,14 @@ var reverse = function(string) {
 // 10. Write a function that determines if a string is a palindrome.
 var palindrome = function(string) {
     var cleanStr = string.toLowerCase().replace(" ", "");
-    var cleanReverse = reverse(string).toLowerCase().replace(" ", "");
-    return cleanStr === cleanReverse;
+    
+    var a = Array.from(arguments)[1] || 0;
+    var z = Array.from(arguments)[2] || cleanStr.length - 1;
+    if(a === z) return true;
+    if(cleanStr[a] !== cleanStr[z]) return false;
+    return palindrome(cleanStr, ++a, --z);
 };
+
 
 // 11. Write a function that returns the remainder of x divided by y without using the
 // modulo (%) operator.
@@ -113,6 +118,10 @@ var palindrome = function(string) {
 // modulo(17,5) // 2
 // modulo(22,6) // 4
 var modulo = function(x, y) {
+    if(x === 0 || x < y) return 0;
+    if(y === 0) return NaN;
+    if(y === 1) return x;
+
 
 
 };
@@ -129,24 +138,26 @@ var multiply = function(x, y) {
 // 13. Write a function that divides two numbers without using the / operator  or
 // JavaScript's Math object.
 var divide = function(x, y) {
-    // var counter = Array.from(arguments)[2] || 0;
-    // if(x < 0 && y < 0) {
-    //     return divide(-x, -y);
-    // }
-    // if(x < y) return counter;
-    // else if(x >= y){
-    //     counter++;
-    //     return divide(x -=y , y, counter);
-    // }
-};
+    if(y === 0) return NaN;
+    if(y === 1) return x;
+    var count = Array.from(arguments)[2] || 0;
+    if(x < 0 || x < y) return count;
+    x = x - y;
+    return divide(x, y, ++count);
 
+};
 // 14. Find the greatest common divisor (gcd) of two positive numbers.  The GCD of two
 // integers is the greatest integer that divides both x and y with no remainder.
 // Example:  gcd(4,36);  // 4
 // http://www.cse.wustl.edu/~kjg/cse131/Notes/Recursion/recursion.html
 // https://www.khanacademy.org/computing/computer-science/cryptography/modarithmetic/a/the-euclidean-algorithm
 var gcd = function(x, y) {
-
+    if(x < 0 || y < 0) return null;
+    if (y) {
+        return gcd(y, x % y);
+    } else {
+        return Math.abs(x);
+    }
 };
 
 // 15. Write a function that compares each character of two strings and returns true if
@@ -159,8 +170,9 @@ var compareStr = function(str1, str2) {
     if(str1.length !== str2.length) return false;
     else if(str1[counter] !== str2[counter]) return false;
     if(counter === str1.length) return str1[counter] === str2[counter];
-    else if(str1[counter] === str2[counter]) return compareStr(str1, str2, ++counter);
-    
+    else if(str1[counter] === str2[counter]) {
+        return compareStr(str1, str2, ++counter);
+    }
 };
 
 // 16. Write a function that accepts a string and creates an array where each letter
@@ -176,8 +188,14 @@ var createArray = function(str){
 
 // 17. Reverse the order of an array
 var reverseArr = function (array) {    
-    if (array.length === 0) return array;
-    else return reverseArr(array.slice(1)) + array[0];  
+    var newArr = Array.from(arguments)[1] || [];
+    var i = Array.from(arguments)[2] || array.length - 1;
+    if(newArr.length === array.length - 1){
+        newArr.push(array[0]);
+        return newArr;
+    }
+    newArr.push(array[i]);  
+    return reverseArr(array, newArr, i = i - 1);  
 };
 
 // 18. Create a new array with a given value and length.
@@ -281,11 +299,15 @@ var fibonacci = function(n) {
 // nthFibo(7); // 13
 // nthFibo(3); // 2
 var nthFibo = function(n) {
-    var fibSeq = fibonacci(n);
+    var fib = Array.from(arguments)[1] || [0, 1];
     if(n < 0) return null;
-    if(n === 0) return n;
-    var spot = fibSeq[n];
-    return spot;
+    if(n === 0) return 0;
+    if(fib.length === n + 1) return fib[n];
+    var val1 = fib[fib.length - 2];
+    var val2 = fib[fib.length - 1];
+    var sum = val1 + val2;
+    fib.push(sum);
+    return nthFibo(n, fib);
 };
 
 // 26. Given an array of words, return a new array containing each word capitalized.
@@ -332,7 +354,9 @@ var nestedEvenSum = function(obj) {
         }
         if(typeof obj[key] === 'number'){
             if(isEven(obj[key])) total += obj[key];
-        }    
+        
+        
+    }    
     }
     return total;
 };
@@ -400,12 +424,14 @@ var augmentElements = function(array, aug) {
 var minimizeZeroes = function(array, i = 0) {
     if(i === array.length) return array;
     if(array[i] === 0 && array[i + 1] === 0){
+        if(array[i + 2] === 0){
+            array.splice(i, 2);
+            return minimizeZeroes(array, ++i);
+        }
         array.splice(i, 1);
-        return minimizeZeroes(array, ++i)
     }
     return minimizeZeroes(array, ++i);
 };
-
 // 34. Alternate the numbers in an array between positive and negative regardless of
 // their original sign.  The first number in the index always needs to be positive.
 // alternateSign([2,7,8,3,1,4]) // [2,-7,8,-3,1,-4]
