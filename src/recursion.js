@@ -23,15 +23,24 @@ var sum = function(array) {
 
 // 3. Sum all numbers in an array containing nested arrays.
 // Example: arraySum([1,[2,3],[[4]],5]); // 15
-var arraySum = function(array) {
-    var flat = flatten(array);
-    if(flat.length === 0) return 0;
-    if(flat.length === 1) return flat[0];
-    flat[0] += flat[flat.length - 1];
-    flat.pop();
-    return arraySum(flat);  
+var arraySum = function(array, sum = 0) {
+    for(var i = 0; i < array.length; i++){
+        if(typeof array[i] === 'number'){
+            sum += array[i];
+        } else if(Array.isArray(array[i])){
+            sum += arraySum(array[i]);
+        }
+    }
+
+    return sum;
 };
 
+    // var flat = flatten(array);
+    // if(flat.length === 0) return 0;
+    // if(flat.length === 1) return flat[0];
+    // flat[0] += flat[flat.length - 1];
+    // flat.pop();
+    // return arraySum(flat); 
 // 4. Check if a number is even.
 var isEven = function(n) {
     if(n < 0) return isEven(-n);
@@ -76,8 +85,7 @@ var range = function(x, y) {
 // https://www.khanacademy.org/computing/computer-science/algorithms/recursive-algorithms/a/computing-powers-of-a-number
 var exponent = function(base, exp) {    
     if(exp === 0) return 1;
-    else if(exp === 1) return base;
-    else if (exp < 0) return 1 / base * exponent(base, ++exp);  
+    else if (exp < 0) return exponent(base, ++exp) / base;  
     return base * exponent(base, --exp);
 };
 
@@ -102,7 +110,7 @@ var reverse = function(string) {
 
 // 10. Write a function that determines if a string is a palindrome.
 var palindrome = function(string) {
-    var cleanStr = string.toLowerCase().replace(" ", "");
+    var cleanStr = string.toLowerCase().replace(/ /gi, "");
     
     var a = Array.from(arguments)[1] || 0;
     var z = Array.from(arguments)[2] || cleanStr.length - 1;
@@ -118,10 +126,13 @@ var palindrome = function(string) {
 // modulo(17,5) // 2
 // modulo(22,6) // 4
 var modulo = function(x, y) {
-var q = divide(x, y);
-var p = multiply(q, y);
-var m = x - p;
-return m;
+
+    var q = divide(x, y);
+    var p = multiply(q, y);
+    var m = x - p;
+
+    if(m < 0) return  x;
+    return m;
 
 };
 
@@ -165,15 +176,15 @@ var gcd = function(x, y) {
 // compareStr('', '') // true
 // compareStr('tomato', 'tomato') // true
 var compareStr = function(str1, str2) { 
-    var counter = Array.from(arguments)[2] || 0;
-    if(str1.length !== str2.length) return false;
-    else if(str1[counter] !== str2[counter]) return false;
-    if(counter === str1.length) return str1[counter] === str2[counter];
-    else if(str1[counter] === str2[counter]) {
-        return compareStr(str1, str2, ++counter);
-    }
+
+    var i = Array.from(arguments)[2] || 0;
+    if(str1[i] !== str2[i]) return false;
+    if(i === str1.length) return true;
+    if(str1[i] === str2[i]) return compareStr(str1, str2, ++i);
+
 };
 
+  
 // 16. Write a function that accepts a string and creates an array where each letter
 // occupies an index of the array.
 var createArray = function(str){
@@ -235,13 +246,14 @@ var rMap = function(array, callback) {
 // var testobj = {'e': {'x':'y'}, 't':{'r': {'e':'r'}, 'p': {'y':'r'}},'y':'e'};
 // countKeysInObj(testobj, 'r') // 1
 // countKeysInObj(testobj, 'e') // 2
-var countKeysInObj = function(obj, key) {
-    var total = Array.from(arguments)[2] || 0;
-    for(var k in obj){
-        if(k === key) total += 1;
-        if(typeof obj[k] === 'object') {
-            return countKeysInObj(obj[k], key, total);
-        }    
+var countKeysInObj = function(obj, key, total = 0) {
+    for(var prop in obj){
+        if(prop === key){
+            total++;
+        }
+        if(typeof obj[prop] === 'object'){
+            total += countKeysInObj(obj[prop], key);
+        }
     }
     return total;
 };
@@ -250,13 +262,15 @@ var countKeysInObj = function(obj, key) {
 // var testobj = {'e': {'x':'y'}, 't':{'r': {'e':'r'}, 'p': {'y':'r'}},'y':'e'};
 // countValuesInObj(testobj, 'r') // 2
 // countValuesInObj(testobj, 'e') // 1
-var countValuesInObj = function(obj, value) {
-    var total = Array.from(arguments)[2] || 0;
-    for(var k in obj){
-        if(obj[k] === value) total += 1;
-        if(typeof obj[k] === 'object') {
-            return countValuesInObj(obj[k], value, total);
-        }    
+var countValuesInObj = function(obj, value, total = 0) {
+    for(var prop in obj){
+        if(typeof obj[prop] === 'object'){
+            total += countValuesInObj(obj[prop], value);
+        }
+        if(obj[prop] === value){
+            total++;
+        }
+
     }
     return total;
 };
@@ -264,15 +278,14 @@ var countValuesInObj = function(obj, value) {
 // 23. Find all keys in an object (and nested objects) by a provided name and rename
 // them to a provided new name while preserving the value stored at that key.
 var replaceKeysInObj = function(obj, key, newKey) {
-    for(var k in obj){
-        if(k === key) {
-            Object.defineProperty(obj, newKey,
-                Object.getOwnPropertyDescriptor(obj, k));
-            delete obj[k];    
+    for(var prop in obj){
+        if(typeof obj[prop] === 'object'){
+            replaceKeysInObj(obj[prop], key, newKey);
         }
-        if(typeof obj[k] === 'object') {
-            return replaceKeysInObj(obj[k], key, newKey);
-        }    
+        if(prop === key){
+            obj[newKey] = obj[prop];
+            delete obj[prop];
+        }
     }
     return obj;
 };
@@ -346,17 +359,14 @@ var capitalizeFirst = function(array) {
 //   e: {e: {e: 2}, ee: 'car'}
 // };
 // nestedEvenSum(obj1); // 10
-var nestedEvenSum = function(obj) {
-    var total = Array.from(arguments)[1] || 0;
-    for(var key in obj){
-        if(typeof obj[key] === 'object'){
-            return nestedEvenSum(obj[key], total);
+var nestedEvenSum = function(obj, total = 0) {
+    for(var prop in obj){
+        if(typeof obj[prop] === 'object'){
+            total += nestedEvenSum(obj[prop]);
         }
-        if(typeof obj[key] === 'number'){
-            if(isEven(obj[key])) total += obj[key];
-        
-        
-    }    
+        if(typeof obj[prop] === 'number' && obj[prop] % 2 === 0){
+            total += obj[prop];
+        } 
     }
     return total;
 };
